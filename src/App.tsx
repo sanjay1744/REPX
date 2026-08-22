@@ -5,6 +5,7 @@ import { Navbar } from './components/Navigation/Navbar';
 import { RestTimer } from './components/Workout/RestTimer';
 import { Dashboard } from './pages/Dashboard';
 import { WorkoutSessionPage } from './pages/WorkoutSession';
+import { WorkoutTab } from './pages/WorkoutTab';
 import { HistoryPage } from './pages/History';
 import { AnalyticsPage } from './pages/Analytics';
 import { PersonalRecordsPage } from './pages/PersonalRecords';
@@ -35,14 +36,14 @@ export function App() {
   };
 
   return (
-    <div className="min-h-screen bg-gym-bg text-slate-100 font-sans">
+    <div className="min-h-screen bg-[#08080C] text-zinc-100 font-sans relative">
       <Navbar
         activeTab={activeTab}
         setActiveTab={setActiveTab}
         isSessionActive={!!activeSession}
       />
 
-      <main className="max-w-6xl mx-auto px-4 pt-6">
+      <main className="max-w-md mx-auto sm:max-w-xl px-3 sm:px-4 pt-3 sm:pt-4 relative z-10">
         {activeTab === 'dashboard' && (
           <Dashboard
             onStartWorkout={handleStartWorkout}
@@ -51,9 +52,11 @@ export function App() {
         )}
 
         {activeTab === 'workout' && (
-          <WorkoutSessionPage
-            onNavigateTab={setActiveTab}
-          />
+          activeSession ? (
+            <WorkoutSessionPage onNavigateTab={setActiveTab} />
+          ) : (
+            <WorkoutTab onStartWorkout={handleStartWorkout} />
+          )
         )}
 
         {activeTab === 'history' && <HistoryPage />}

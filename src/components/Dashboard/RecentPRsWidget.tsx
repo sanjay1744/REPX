@@ -143,88 +143,88 @@ export const RecentPRsWidget: React.FC = () => {
 
   return (
     <div
-      className="bg-gym-card border border-gym-border/80 rounded-3xl p-5 shadow-xl select-none transition-all duration-300 relative overflow-hidden group hover:border-amber-500/40"
+      className="glass-panel rounded-2xl sm:rounded-3xl p-4 sm:p-5 select-none transition-all duration-300 relative overflow-hidden group border border-white/10"
       onMouseEnter={() => setIsPaused(true)}
       onMouseLeave={() => setIsPaused(false)}
     >
-      {/* Background ambient glow effect */}
-      <div className="absolute top-0 right-0 w-36 h-36 bg-amber-500/5 rounded-full blur-3xl pointer-events-none" />
-
       {/* Header Section */}
-      <div className="flex items-center justify-between mb-4">
-        <div className="flex items-center gap-2.5">
-          <span className="text-xl leading-none animate-bounce" style={{ animationDuration: '3s' }}>
+      <div className="flex items-center justify-between mb-3.5 relative z-10">
+        <div className="flex items-center gap-2">
+          <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-xl glass-input border border-white/15 flex items-center justify-center text-white font-bold text-xs sm:text-sm">
             🏆
-          </span>
-          <h3 className="text-base font-black tracking-wider text-amber-400 uppercase font-sans">
-            RECENT PRs
-          </h3>
+          </div>
+          <div>
+            <h3 className="text-xs sm:text-sm font-black tracking-wider text-white uppercase font-sans">
+              PERSONAL RECORDS TICKER
+            </h3>
+            <p className="text-[8px] sm:text-[9px] text-zinc-400 font-bold uppercase tracking-wider">Top Compound Benchmarks</p>
+          </div>
         </div>
 
         {/* Page / Auto-swap Status Controls */}
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-1.5 sm:gap-2">
           {/* Pause / Live Indicator */}
           <button
             onClick={() => setIsPaused(!isPaused)}
-            className="flex items-center gap-1 text-[10px] font-extrabold px-2 py-0.5 rounded-full bg-slate-900/80 border border-slate-800 text-slate-400 hover:text-amber-300 transition-colors"
+            className="flex items-center gap-1 sm:gap-1.5 text-[9px] sm:text-[10px] font-extrabold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full glass-input text-zinc-300 hover:text-white transition-colors"
             title={isPaused ? "Resume auto-swap" : "Pause auto-swap"}
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${isPaused ? 'bg-amber-400' : 'bg-emerald-400 animate-ping'}`} />
-            <span>{isPaused ? 'PAUSED' : 'SWAPPING'}</span>
+            <span className={`w-1.5 h-1.5 rounded-full ${isPaused ? 'bg-zinc-500' : 'bg-white animate-ping'}`} />
+            <span>{isPaused ? 'PAUSED' : 'LIVE'}</span>
           </button>
 
           {/* Navigation Arrows */}
-          <div className="flex items-center gap-1 text-slate-400">
+          <div className="flex items-center gap-0.5 text-zinc-400">
             <button
               onClick={handlePrev}
-              className="w-6 h-6 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center hover:bg-slate-800 hover:text-white transition-all active:scale-95"
+              className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg glass-input flex items-center justify-center hover:text-white transition-all active:scale-95"
               aria-label="Previous PRs"
             >
-              <ChevronLeft className="w-3.5 h-3.5" />
+              <ChevronLeft className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </button>
-            <span className="text-[10px] font-mono font-bold text-slate-400 px-1">
+            <span className="text-[9px] sm:text-[10px] font-mono font-extrabold text-zinc-400 px-0.5">
               {currentPage + 1}/{totalPages}
             </span>
             <button
               onClick={handleNext}
-              className="w-6 h-6 rounded-lg bg-slate-900 border border-slate-800 flex items-center justify-center hover:bg-slate-800 hover:text-white transition-all active:scale-95"
+              className="w-5 h-5 sm:w-6 sm:h-6 rounded-lg glass-input flex items-center justify-center hover:text-white transition-all active:scale-95"
               aria-label="Next PRs"
             >
-              <ChevronRight className="w-3.5 h-3.5" />
+              <ChevronRight className="w-3 h-3 sm:w-3.5 sm:h-3.5" />
             </button>
           </div>
         </div>
       </div>
 
       {/* 2 Visible Primary Compound Workouts Container */}
-      <div className="min-h-[96px] flex flex-col justify-center gap-3 relative">
+      <div className="min-h-[84px] sm:min-h-[96px] flex flex-col justify-center gap-2.5 relative z-10">
         <div
-          className={`space-y-3 transition-all duration-300 transform ${
+          className={`space-y-2 transition-all duration-300 transform ${
             isAnimating ? 'opacity-0 translateY-2 scale-[0.99]' : 'opacity-100 translateY-0 scale-100 animate-swap-in'
           }`}
         >
           {visiblePRs.map((pr) => (
             <div
               key={pr.id}
-              className="flex items-center justify-between bg-slate-950/40 hover:bg-slate-900/60 border border-slate-800/60 hover:border-amber-500/30 rounded-2xl px-4 py-2.5 transition-all duration-200 group/row"
+              className="flex items-center justify-between glass-input hover:border-white/20 rounded-xl sm:rounded-2xl px-3 py-2 sm:px-4 sm:py-2.5 transition-all duration-200 group/row"
             >
               {/* Left Column: Exercise Name */}
-              <div className="w-2/5 min-w-0 pr-2">
-                <span className="text-sm sm:text-base font-bold text-slate-100 group-hover/row:text-amber-300 transition-colors truncate block">
+              <div className="w-2/5 min-w-0 pr-1">
+                <span className="text-xs sm:text-sm font-bold text-white transition-colors truncate block">
                   {pr.name}
                 </span>
               </div>
 
               {/* Center Column: Weight x Reps */}
               <div className="w-2/5 text-center font-mono">
-                <span className="text-sm sm:text-base font-extrabold text-slate-200">
-                  {pr.weight} {pr.unit} <span className="text-slate-400 font-sans font-medium text-xs sm:text-sm">×</span> {pr.reps}
+                <span className="text-xs sm:text-sm font-black text-white">
+                  {pr.weight} {pr.unit} <span className="text-zinc-400 font-sans font-medium text-[10px] sm:text-xs">×</span> {pr.reps}
                 </span>
               </div>
 
               {/* Right Column: Weight Delta / Increase */}
               <div className="w-1/5 text-right">
-                <span className="text-xs sm:text-sm font-extrabold text-amber-400 bg-amber-500/10 border border-amber-500/20 px-2 py-0.5 rounded-lg inline-block shadow-sm">
+                <span className="text-[10px] sm:text-xs font-black text-white bg-white/10 border border-white/20 px-2 py-0.5 rounded-lg sm:rounded-xl inline-block">
                   {pr.increase}
                 </span>
               </div>
@@ -234,13 +234,13 @@ export const RecentPRsWidget: React.FC = () => {
       </div>
 
       {/* Pagination Indicator Dots */}
-      <div className="flex items-center justify-center gap-1.5 mt-3 pt-1 border-t border-slate-800/40">
+      <div className="flex items-center justify-center gap-1.5 mt-2.5 pt-2 border-t border-white/[0.08] relative z-10">
         {Array.from({ length: totalPages }).map((_, idx) => (
           <button
             key={idx}
             onClick={() => triggerPageChange(() => idx)}
             className={`h-1.5 rounded-full transition-all duration-300 ${
-              idx === currentPage ? 'w-5 bg-amber-400 shadow-sm shadow-amber-950' : 'w-1.5 bg-slate-800 hover:bg-slate-700'
+              idx === currentPage ? 'w-4 sm:w-5 bg-white shadow-sm' : 'w-1.5 bg-zinc-800 hover:bg-zinc-700'
             }`}
             aria-label={`Go to slide ${idx + 1}`}
           />

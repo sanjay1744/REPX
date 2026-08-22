@@ -1,5 +1,5 @@
 import { create } from 'zustand';
-import type { WorkoutProgram, WorkoutSession, PersonalRecord, BodyMetric, WorkoutDay, SetLog } from '../types';
+import type { WorkoutProgram, WorkoutSession, PersonalRecord, BodyMetric, WorkoutDay, SetLog, ExerciseLog } from '../types';
 import { INITIAL_PPL_PROGRAM } from '../data/pplProgramData';
 import { checkSetForPR } from '../services/progressionEngine';
 import { db } from '../lib/firebase';
@@ -26,6 +26,7 @@ interface WorkoutStoreState {
   toggleSetCompletion: (exerciseId: string, setNumber: number) => void;
   addSetToExercise: (exerciseId: string) => void;
   deleteSetFromExercise: (exerciseId: string, setNumber: number) => void;
+  addExerciseToActiveSession: (exercise: { exerciseId: string; name: string; muscleGroup: string; equipment: string }) => void;
   finishWorkout: (userId?: string) => Promise<void>;
   discardWorkout: () => void;
 
@@ -194,6 +195,32 @@ export const useWorkoutStore = create<WorkoutStoreState>((set, get) => ({
     });
 
     set({ activeSession: { ...activeSession, exercises: updatedExercises } });
+  },
+
+  addExerciseToActiveSession: (exercise: { exerciseId: string; name: string; muscleGroup: string; equipment: string }) => {
+    const { activeSession } = get();
+    if (!activeSession) return;
+
+    const newExLog: ExerciseLog = {
+      id: `ex-log-${Date.now()}-${Math.random().toString(36).substring(2, 6)}`,
+      exerciseId: exercise.exerciseId,
+      exerciseName: exercise.name,
+      muscleGroup: exercise.muscleGroup,
+      targetSets: 3,
+      minReps: 8,
+      maxReps: 12,
+      sets: [
+        { id: `set-${Date.now()}-1`, setNumber: 1, weight: 20, reps: 10, completed: false },
+        { id: `set-${Date.now()}-2`, setNumber: 2, weight: 20, reps: 10, completed: false },
+        { id: `set-${Date.now()}-3`, setNumber: 3, weight: 20, reps: 10, completed: false }
+      ]
+    };
+
+    const updatedExercises = [...activeSession.exercises, newExLog];
+    set({
+      activeSession: { ...activeSession, exercises: updatedExercises },
+      activeExerciseIndex: updatedExercises.length - 1
+    });
   },
 
   deleteSetFromExercise: (exerciseId: string, setNumber: number) => {

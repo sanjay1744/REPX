@@ -10,36 +10,36 @@ interface NavbarProps {
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, isSessionActive }) => {
   const { user, isGuest, signInWithGoogle, signOut } = useAuthStore();
+  const isWorkoutSessionActive = isSessionActive && activeTab === 'workout';
 
   return (
     <>
-      {/* Mobile-Optimized Top App Bar */}
-      <header className="sticky top-0 z-40 bg-gym-bg/95 backdrop-blur-xl border-b border-gym-border/80 px-4 py-2.5">
+      {/* Top Navbar Header */}
+      <header className={`${isWorkoutSessionActive ? 'relative' : 'sticky top-0'} z-30 glass-nav px-3 py-2.5 sm:px-4 sm:py-3 border-b border-white/10 bg-[#08080C]/90 backdrop-blur-md transition-all`}>
         <div className="max-w-md mx-auto sm:max-w-xl flex items-center justify-between">
           <div 
             onClick={() => setActiveTab('dashboard')} 
-            className="flex items-center gap-2 cursor-pointer"
+            className="flex items-center gap-2 cursor-pointer group"
           >
-            <div className="w-8 h-8 rounded-xl bg-gradient-to-tr from-emerald-600 to-teal-400 flex items-center justify-center shadow-md shadow-emerald-950/40">
-              <Dumbbell className="w-4 h-4 text-slate-950 font-bold" />
+            <div className="relative w-8 h-8 rounded-xl bg-white p-0.5 shadow-md">
+              <div className="w-full h-full bg-[#08080C] rounded-[10px] flex items-center justify-center">
+                <Dumbbell className="w-3.5 h-3.5 text-white font-black" />
+              </div>
             </div>
             <div>
-              <h1 className="text-base font-black tracking-tight bg-gradient-to-r from-white via-slate-200 to-emerald-400 bg-clip-text text-transparent">
-                GYM OVERLOAD
+              <h1 className="text-base sm:text-lg font-black tracking-wider text-white">
+                REPX
               </h1>
-              <p className="text-[9px] text-emerald-400 font-bold tracking-wider uppercase -mt-0.5">
-                6-Day PPL System
-              </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-1.5 sm:gap-2">
             {isSessionActive && activeTab !== 'workout' && (
               <button
                 onClick={() => setActiveTab('workout')}
-                className="flex items-center gap-1.5 bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 px-2.5 py-1 rounded-xl text-xs font-bold animate-pulse"
+                className="flex items-center gap-1 bg-white/10 text-white border border-white/20 px-2.5 py-1 rounded-xl text-[10px] sm:text-xs font-black animate-pulse"
               >
-                <span className="w-2 h-2 rounded-full bg-emerald-400"></span>
+                <span className="w-1.5 h-1.5 rounded-full bg-white shadow-[0_0_6px_#FFFFFF]"></span>
                 <span>Active</span>
               </button>
             )}
@@ -47,18 +47,18 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, isSessi
             {isGuest ? (
               <button
                 onClick={signInWithGoogle}
-                className="flex items-center gap-1 bg-gym-card hover:bg-slate-800 text-slate-200 border border-gym-border px-2.5 py-1 rounded-xl text-xs font-semibold"
+                className="flex items-center gap-1 glass-input text-white px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold hover:bg-white hover:text-black transition-all"
               >
-                <LogIn className="w-3.5 h-3.5 text-emerald-400" />
+                <LogIn className="w-3 h-3" />
                 <span>Sync</span>
               </button>
             ) : (
-              <div className="flex items-center gap-1.5 bg-gym-card border border-gym-border px-2.5 py-1 rounded-xl text-xs">
-                <span className="text-slate-300 font-bold max-w-[80px] truncate">{user?.name.split(' ')[0]}</span>
+              <div className="flex items-center gap-1.5 glass-input px-2.5 py-1.5 rounded-xl text-xs">
+                <span className="text-white font-bold max-w-[70px] sm:max-w-[90px] truncate">{user?.name.split(' ')[0]}</span>
                 <button
                   onClick={signOut}
                   title="Sign Out"
-                  className="text-slate-400 hover:text-rose-400 transition-colors ml-0.5"
+                  className="text-zinc-400 hover:text-rose-400 transition-colors"
                 >
                   <LogOut className="w-3 h-3" />
                 </button>
@@ -68,69 +68,69 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, isSessi
         </div>
       </header>
 
-      {/* Pakka Mobile Bottom Navigation Bar */}
-      <nav className="fixed bottom-0 left-0 right-0 z-40 bg-gym-bg/95 backdrop-blur-xl border-t border-gym-border/80 px-1 py-1.5">
-        <div className="max-w-md mx-auto flex items-center justify-around">
+      {/* Mobile Compact Floating Bottom Dock Navigation Bar */}
+      <nav className="fixed bottom-2.5 left-3 right-3 z-40 max-w-md mx-auto sm:max-w-lg">
+        <div className="glass-dock rounded-2xl sm:rounded-3xl p-1 flex items-center justify-around shadow-2xl">
           <button
             onClick={() => setActiveTab('dashboard')}
-            className={`flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-2xl min-w-[60px] text-[10px] font-bold transition-all ${
+            className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-2.5 sm:px-3.5 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-extrabold transition-all duration-200 ${
               activeTab === 'dashboard'
-                ? 'text-emerald-400 bg-emerald-500/15 border border-emerald-500/30'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'text-black bg-white shadow-md scale-105'
+                : 'text-zinc-400 hover:text-white'
             }`}
           >
-            <LayoutDashboard className="w-5 h-5" />
+            <LayoutDashboard className="w-4 h-4 sm:w-5 sm:h-5" />
             <span>Dashboard</span>
           </button>
 
           <button
             onClick={() => setActiveTab('workout')}
-            className={`relative flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-2xl min-w-[60px] text-[10px] font-bold transition-all ${
+            className={`relative flex flex-col items-center justify-center gap-0.5 py-1.5 px-2.5 sm:px-3.5 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-extrabold transition-all duration-200 ${
               activeTab === 'workout'
-                ? 'text-emerald-400 bg-emerald-500/15 border border-emerald-500/30'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'text-black bg-white shadow-md scale-105'
+                : 'text-zinc-400 hover:text-white'
             }`}
           >
             {isSessionActive && (
-              <span className="absolute top-1 right-3 w-2 h-2 rounded-full bg-emerald-400 animate-ping"></span>
+              <span className="absolute top-1 right-2 w-1.5 h-1.5 rounded-full bg-white animate-ping"></span>
             )}
-            <Dumbbell className="w-5 h-5" />
+            <Dumbbell className="w-4 h-4 sm:w-5 sm:h-5" />
             <span>Workout</span>
           </button>
 
           <button
             onClick={() => setActiveTab('history')}
-            className={`flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-2xl min-w-[60px] text-[10px] font-bold transition-all ${
+            className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-2.5 sm:px-3.5 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-extrabold transition-all duration-200 ${
               activeTab === 'history'
-                ? 'text-emerald-400 bg-emerald-500/15 border border-emerald-500/30'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'text-black bg-white shadow-md scale-105'
+                : 'text-zinc-400 hover:text-white'
             }`}
           >
-            <History className="w-5 h-5" />
+            <History className="w-4 h-4 sm:w-5 sm:h-5" />
             <span>History</span>
           </button>
 
           <button
             onClick={() => setActiveTab('analytics')}
-            className={`flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-2xl min-w-[60px] text-[10px] font-bold transition-all ${
+            className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-2.5 sm:px-3.5 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-extrabold transition-all duration-200 ${
               activeTab === 'analytics'
-                ? 'text-emerald-400 bg-emerald-500/15 border border-emerald-500/30'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'text-black bg-white shadow-md scale-105'
+                : 'text-zinc-400 hover:text-white'
             }`}
           >
-            <BarChart3 className="w-5 h-5" />
+            <BarChart3 className="w-4 h-4 sm:w-5 sm:h-5" />
             <span>Analytics</span>
           </button>
 
           <button
             onClick={() => setActiveTab('prs')}
-            className={`flex flex-col items-center justify-center gap-1 py-1 px-3 rounded-2xl min-w-[60px] text-[10px] font-bold transition-all ${
+            className={`flex flex-col items-center justify-center gap-0.5 py-1.5 px-2.5 sm:px-3.5 rounded-xl sm:rounded-2xl text-[9px] sm:text-[10px] font-extrabold transition-all duration-200 ${
               activeTab === 'prs'
-                ? 'text-amber-400 bg-amber-500/15 border border-amber-500/30'
-                : 'text-slate-400 hover:text-slate-200'
+                ? 'text-black bg-white shadow-md scale-105'
+                : 'text-zinc-400 hover:text-white'
             }`}
           >
-            <Trophy className="w-5 h-5" />
+            <Trophy className="w-4 h-4 sm:w-5 sm:h-5" />
             <span>PRs</span>
           </button>
         </div>
@@ -138,3 +138,4 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, isSessi
     </>
   );
 };
+

@@ -20,50 +20,50 @@ export const BeatLastTimeCard: React.FC<BeatLastTimeCardProps> = ({
   const topPreviousSet = previousSets.filter((s) => s.completed && s.weight > 0).sort((a, b) => b.weight - a.weight)[0];
 
   return (
-    <div className="bg-gradient-to-r from-slate-900 via-gym-card to-slate-900 border border-emerald-500/30 rounded-2xl p-4 shadow-xl">
-      <div className="flex items-center justify-between mb-3">
+    <div className="glass-panel border-white/10 rounded-2xl p-3.5 sm:p-4 shadow-xl relative overflow-hidden">
+      <div className="flex items-center justify-between mb-2.5">
         <div className="flex items-center gap-2">
-          <div className="w-7 h-7 rounded-lg bg-emerald-500/20 text-emerald-400 flex items-center justify-center">
-            <Flame className="w-4 h-4 text-emerald-400" />
+          <div className="w-6 h-6 sm:w-7 sm:h-7 rounded-xl glass-input border border-white/15 text-white flex items-center justify-center">
+            <Flame className="w-3.5 h-3.5 text-white fill-white" />
           </div>
-          <span className="text-xs font-bold uppercase tracking-wider text-emerald-400">
-            Beat Last Time Target
+          <span className="text-[11px] sm:text-xs font-black uppercase tracking-wider text-white">
+            BEAT LAST TIME TARGET
           </span>
         </div>
         {recommendation.status === 'increase_weight' && (
-          <span className="inline-flex items-center gap-1 bg-amber-500/20 text-amber-300 border border-amber-500/40 px-2 py-0.5 rounded-full text-[10px] font-bold">
-            <Sparkles className="w-3 h-3 text-amber-400" />
+          <span className="inline-flex items-center gap-1 bg-white/10 text-white border border-white/20 px-2 py-0.5 rounded-full text-[9px] font-black shadow-sm">
+            <Sparkles className="w-3 h-3 text-white" />
             +WEIGHT LOAD
           </span>
         )}
         {recommendation.status === 'increase_reps' && (
-          <span className="inline-flex items-center gap-1 bg-emerald-500/20 text-emerald-300 border border-emerald-500/40 px-2 py-0.5 rounded-full text-[10px] font-bold">
-            <TrendingUp className="w-3 h-3 text-emerald-400" />
+          <span className="inline-flex items-center gap-1 bg-white/10 text-white border border-white/20 px-2 py-0.5 rounded-full text-[9px] font-black shadow-sm">
+            <TrendingUp className="w-3 h-3 text-white" />
             +1 REP TARGET
           </span>
         )}
       </div>
 
-      <div className="grid grid-cols-2 gap-3 mb-3">
-        <div className="bg-slate-950/60 rounded-xl p-3 border border-slate-800">
-          <div className="text-[10px] font-semibold text-slate-400 uppercase mb-1">Previous Session</div>
+      <div className="grid grid-cols-2 gap-2.5 mb-2.5">
+        <div className="glass-input rounded-xl p-2.5 sm:p-3">
+          <div className="text-[9px] sm:text-[10px] font-extrabold text-zinc-400 uppercase tracking-wider mb-0.5">Previous Session</div>
           {topPreviousSet ? (
-            <div className="text-lg font-black text-slate-200">
-              {topPreviousSet.weight} <span className="text-xs font-medium text-slate-400">kg</span> × {topPreviousSet.reps} <span className="text-xs font-medium text-slate-400">reps</span>
+            <div className="text-base sm:text-lg font-black text-white">
+              {topPreviousSet.weight} <span className="text-[10px] sm:text-xs font-medium text-zinc-400">kg</span> × {topPreviousSet.reps} <span className="text-[10px] sm:text-xs font-medium text-zinc-400">reps</span>
             </div>
           ) : (
-            <div className="text-xs text-slate-500 italic py-1">No previous logs yet</div>
+            <div className="text-[11px] text-zinc-500 italic py-0.5">No previous logs yet</div>
           )}
         </div>
 
-        <div className="bg-emerald-950/30 rounded-xl p-3 border border-emerald-500/30">
-          <div className="text-[10px] font-semibold text-emerald-400 uppercase mb-1 flex items-center gap-1">
-            <Target className="w-3 h-3" /> Today's Goal
+        <div className="glass-card-active rounded-xl p-2.5 sm:p-3 border border-white/30">
+          <div className="text-[9px] sm:text-[10px] font-extrabold text-white uppercase tracking-wider mb-0.5 flex items-center gap-1">
+            <Target className="w-3 h-3 text-white" /> Today's Goal
           </div>
-          <div className="text-lg font-black text-emerald-300">
+          <div className="text-base sm:text-lg font-black text-white">
             {recommendation.targetWeight > 0 ? (
               <>
-                {recommendation.targetWeight} <span className="text-xs font-medium text-emerald-400">kg</span> × {recommendation.targetReps} <span className="text-xs font-medium text-emerald-400">reps</span>
+                {recommendation.targetWeight} <span className="text-[10px] sm:text-xs font-medium text-zinc-300">kg</span> × {recommendation.targetReps} <span className="text-[10px] sm:text-xs font-medium text-zinc-300">reps</span>
               </>
             ) : (
               <>{recommendation.targetReps} reps</>
@@ -72,7 +72,7 @@ export const BeatLastTimeCard: React.FC<BeatLastTimeCardProps> = ({
         </div>
       </div>
 
-      <p className="text-xs text-slate-300 bg-slate-800/40 rounded-lg p-2 border border-slate-800/80">
+      <p className="text-[11px] sm:text-xs text-zinc-300 glass-input rounded-xl p-2 sm:p-2.5 border border-white/[0.08]">
         💡 {recommendation.reason}
       </p>
     </div>

@@ -20,29 +20,29 @@ export const HistoryPage: React.FC = () => {
   };
 
   return (
-    <div className="space-y-6 pb-24">
+    <div className="space-y-4 sm:space-y-6 pb-24">
       <div className="flex items-center justify-between">
         <div>
-          <h2 className="text-2xl font-black text-white">Workout History</h2>
-          <p className="text-xs text-slate-400">Review your previous sessions and set logs</p>
+          <h2 className="text-xl sm:text-2xl font-black text-white tracking-tight">Workout History</h2>
+          <p className="text-[11px] sm:text-xs text-zinc-400 font-semibold">Review your previous sessions and set logs</p>
         </div>
-        <div className="bg-gym-card border border-gym-border px-3 py-1.5 rounded-xl text-xs font-bold text-emerald-400">
-          {completedSessions.length} Sessions Logged
+        <div className="glass-input border border-white/20 px-3 py-1 sm:px-3.5 sm:py-1.5 rounded-xl sm:rounded-2xl text-[10px] sm:text-xs font-black text-white shadow-sm">
+          {completedSessions.length} Sessions
         </div>
       </div>
 
       {completedSessions.length === 0 ? (
-        <div className="bg-gym-card border border-gym-border rounded-3xl p-8 text-center space-y-3">
-          <div className="w-14 h-14 rounded-2xl bg-slate-900 border border-slate-800 flex items-center justify-center mx-auto text-slate-500">
-            <Calendar className="w-7 h-7" />
+        <div className="glass-panel rounded-2xl sm:rounded-3xl p-6 sm:p-8 text-center space-y-3.5">
+          <div className="w-12 h-12 sm:w-16 sm:h-16 rounded-xl sm:rounded-2xl glass-input flex items-center justify-center mx-auto text-white shadow-xl">
+            <Calendar className="w-6 h-6 sm:w-8 sm:h-8" />
           </div>
-          <h3 className="text-lg font-bold text-white">No Completed Workouts Yet</h3>
-          <p className="text-xs text-slate-400 max-w-xs mx-auto">
+          <h3 className="text-base sm:text-lg font-black text-white">No Completed Workouts Yet</h3>
+          <p className="text-xs text-zinc-400 max-w-xs mx-auto">
             Start a workout session from the home dashboard to log your sets and build your training calendar.
           </p>
         </div>
       ) : (
-        <div className="space-y-3">
+        <div className="space-y-3 sm:space-y-4">
           {completedSessions.map((session: WorkoutSession) => {
             const isExpanded = expandedSessionId === session.id;
             const dateStr = session.completedAt ? format(new Date(session.completedAt), 'PPP') : 'Recent';
@@ -50,65 +50,65 @@ export const HistoryPage: React.FC = () => {
             return (
               <div
                 key={session.id}
-                className="bg-gym-card border border-gym-border rounded-3xl overflow-hidden shadow-lg transition-all"
+                className="glass-panel rounded-2xl sm:rounded-3xl overflow-hidden shadow-2xl transition-all duration-300 hover:border-white/20"
               >
                 <div
                   onClick={() => toggleExpand(session.id)}
-                  className="p-4 cursor-pointer hover:bg-slate-800/50 flex items-center justify-between transition-colors"
+                  className="p-4 sm:p-5 cursor-pointer hover:bg-white/[0.03] flex items-center justify-between transition-colors"
                 >
                   <div className="flex items-center gap-3">
-                    <div className="w-10 h-10 rounded-2xl bg-emerald-500/20 text-emerald-400 flex items-center justify-center font-bold">
-                      <Dumbbell className="w-5 h-5" />
+                    <div className="w-9 h-9 sm:w-11 sm:h-11 rounded-xl sm:rounded-2xl glass-input border border-white/15 text-white flex items-center justify-center font-bold">
+                      <Dumbbell className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                     </div>
                     <div>
-                      <div className="text-[10px] font-bold text-emerald-400 uppercase tracking-wider">
+                      <div className="text-[9px] sm:text-[10px] font-extrabold text-zinc-400 uppercase tracking-widest">
                         {dateStr}
                       </div>
-                      <h4 className="text-base font-black text-white">{session.dayName}</h4>
-                      <p className="text-xs text-slate-400">{session.dayFocus}</p>
+                      <h4 className="text-sm sm:text-base font-black text-white">{session.dayName}</h4>
+                      <p className="text-[11px] sm:text-xs text-zinc-400 font-semibold">{session.dayFocus}</p>
                     </div>
                   </div>
 
-                  <div className="flex items-center gap-4">
+                  <div className="flex items-center gap-3">
                     <div className="hidden sm:block text-right">
-                      <div className="text-xs font-bold text-white">
+                      <div className="text-xs font-black text-white">
                         {(session.totalVolume / 1000).toFixed(1)} Tons
                       </div>
-                      <div className="text-[10px] text-slate-400 font-semibold uppercase">
+                      <div className="text-[10px] text-zinc-400 font-extrabold uppercase">
                         {formatDuration(session.durationSeconds)} • {session.totalSets} Sets
                       </div>
                     </div>
                     {isExpanded ? (
-                      <ChevronDown className="w-5 h-5 text-emerald-400" />
+                      <ChevronDown className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                     ) : (
-                      <ChevronRight className="w-5 h-5 text-slate-500" />
+                      <ChevronRight className="w-4 h-4 sm:w-5 sm:h-5 text-zinc-500" />
                     )}
                   </div>
                 </div>
 
                 {isExpanded && (
-                  <div className="border-t border-slate-800/80 bg-slate-950/60 p-4 space-y-3">
-                    <div className="grid grid-cols-3 gap-2 text-center mb-3">
-                      <div className="bg-slate-900 rounded-xl p-2 border border-slate-800">
-                        <div className="text-xs font-extrabold text-white">{formatDuration(session.durationSeconds)}</div>
-                        <div className="text-[9px] text-slate-400 uppercase font-semibold">Duration</div>
+                  <div className="border-t border-white/[0.08] bg-[#08080C]/60 p-4 sm:p-5 space-y-3.5">
+                    <div className="grid grid-cols-3 gap-2 text-center mb-2.5">
+                      <div className="glass-input rounded-xl sm:rounded-2xl p-2 sm:p-2.5">
+                        <div className="text-xs font-black text-white">{formatDuration(session.durationSeconds)}</div>
+                        <div className="text-[8px] sm:text-[9px] text-zinc-400 uppercase font-extrabold tracking-wider">Duration</div>
                       </div>
-                      <div className="bg-slate-900 rounded-xl p-2 border border-slate-800">
-                        <div className="text-xs font-extrabold text-white">{session.totalSets}</div>
-                        <div className="text-[9px] text-slate-400 uppercase font-semibold">Total Sets</div>
+                      <div className="glass-input rounded-xl sm:rounded-2xl p-2 sm:p-2.5">
+                        <div className="text-xs font-black text-white">{session.totalSets}</div>
+                        <div className="text-[8px] sm:text-[9px] text-zinc-400 uppercase font-extrabold tracking-wider">Total Sets</div>
                       </div>
-                      <div className="bg-slate-900 rounded-xl p-2 border border-slate-800">
-                        <div className="text-xs font-extrabold text-emerald-400">{session.totalVolume} kg</div>
-                        <div className="text-[9px] text-slate-400 uppercase font-semibold">Volume</div>
+                      <div className="glass-input rounded-xl sm:rounded-2xl p-2 sm:p-2.5">
+                        <div className="text-xs font-black text-white">{session.totalVolume} kg</div>
+                        <div className="text-[8px] sm:text-[9px] text-zinc-400 uppercase font-extrabold tracking-wider">Volume</div>
                       </div>
                     </div>
 
                     <div className="space-y-2">
                       {session.exercises.map((ex: ExerciseLog) => (
-                        <div key={ex.id} className="bg-slate-900/90 rounded-xl p-3 border border-slate-800">
+                        <div key={ex.id} className="glass-input rounded-xl sm:rounded-2xl p-3">
                           <div className="flex items-center justify-between mb-1.5">
-                            <span className="text-xs font-bold text-white">{ex.exerciseName}</span>
-                            <span className="text-[10px] text-slate-400 font-semibold">{ex.muscleGroup}</span>
+                            <span className="text-xs font-black text-white">{ex.exerciseName}</span>
+                            <span className="text-[9px] sm:text-[10px] text-zinc-400 font-extrabold">{ex.muscleGroup}</span>
                           </div>
 
                           <div className="flex flex-wrap gap-1.5">
@@ -117,13 +117,13 @@ export const HistoryPage: React.FC = () => {
                               .map((setLog: SetLog) => (
                                 <span
                                   key={setLog.id}
-                                  className={`inline-flex items-center gap-1 text-[11px] px-2 py-0.5 rounded-lg border font-mono ${
+                                  className={`inline-flex items-center gap-1 text-[10px] sm:text-[11px] px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg sm:rounded-xl font-mono ${
                                     setLog.isPR
-                                      ? 'bg-amber-500/20 text-amber-300 border-amber-500/40 font-bold'
-                                      : 'bg-slate-950 text-slate-300 border-slate-800'
+                                      ? 'bg-white text-black font-extrabold shadow-sm'
+                                      : 'glass-input text-zinc-300'
                                   }`}
                                 >
-                                  {setLog.isPR && <Trophy className="w-2.5 h-2.5 text-amber-400" />}
+                                  {setLog.isPR && <Trophy className="w-2.5 h-2.5 text-black" />}
                                   {setLog.weight}kg × {setLog.reps}
                                 </span>
                               ))}

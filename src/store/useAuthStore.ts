@@ -1,7 +1,7 @@
 import { create } from 'zustand';
 import type { UserProfile } from '../types';
 import { auth, googleProvider } from '../lib/firebase';
-import { signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged, type User } from 'firebase/auth';
+import { signInWithPopup, signOut as firebaseSignOut, onAuthStateChanged, type User } from '@firebase/auth';
 
 interface AuthState {
   user: UserProfile | null;

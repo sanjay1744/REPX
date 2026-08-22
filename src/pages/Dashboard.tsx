@@ -3,6 +3,7 @@ import { useWorkoutStore } from '../store/useWorkoutStore';
 import { useAuthStore } from '../store/useAuthStore';
 import { INITIAL_PPL_PROGRAM } from '../data/pplProgramData';
 import { calculateUserStats } from '../services/progressionEngine';
+import { RecentPRsWidget } from '../components/Dashboard/RecentPRsWidget';
 import type { WorkoutSession, ExerciseLog, SetLog } from '../types';
 import {
   Play,
@@ -156,6 +157,9 @@ export const Dashboard: React.FC<DashboardProps> = ({ onStartWorkout, onNavigate
           </button>
         </div>
       )}
+
+      {/* 🏆 RECENT PRs WIDGET: Swapping 2 Primary Compound Workouts */}
+      <RecentPRsWidget />
 
       {/* 📊 ANALYTICS DASHBOARD CARD 1: Weekly Volume & Intensity Curve */}
       <div className="bg-gym-card border border-gym-border rounded-3xl p-4 shadow-xl space-y-3">

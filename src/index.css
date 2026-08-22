@@ -41,6 +41,21 @@
   animation: pulseGlow 2.5s infinite ease-in-out;
 }
 
+@keyframes swapIn {
+  0% {
+    opacity: 0;
+    transform: translateY(8px) scale(0.99);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.animate-swap-in {
+  animation: swapIn 0.35s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
 /* Glass card effect */
 .glass-card {
   background: rgba(21, 29, 42, 0.85);

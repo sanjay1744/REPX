@@ -1,9 +1,18 @@
 import { create } from 'zustand';
-import type { WorkoutProgram, WorkoutSession, PersonalRecord, BodyMetric, WorkoutDay, SetLog, ExerciseLog } from '../types';
+import type { WorkoutProgram, WorkoutSession, PersonalRecord, BodyMetric, WorkoutDay, SetLog, ExerciseLog, ExerciseDefinition, ExerciseTarget } from '../types';
 import { INITIAL_PPL_PROGRAM } from '../data/pplProgramData';
+import { EXERCISE_DATABASE } from '../data/exerciseDatabase';
 import { checkSetForPR } from '../services/progressionEngine';
-import { db } from '../lib/firebase';
-import { collection, doc, setDoc, getDocs, query, orderBy, QueryDocumentSnapshot } from 'firebase/firestore';
+import {
+  getOrSeedExercises,
+  saveCustomExerciseToFirebase,
+  getOrSeedProgram,
+  saveProgramToFirebase,
+  fetchUserSessionsFromFirebase,
+  saveSessionToFirebase,
+  fetchUserPRsFromFirebase,
+  savePRToFirebase
+} from '../services/firebaseService';
 
 interface RestTimerState {
   secondsRemaining: number;
@@ -14,12 +23,18 @@ interface RestTimerState {
 
 interface WorkoutStoreState {
   program: WorkoutProgram;
+  exerciseDatabase: ExerciseDefinition[];
   activeSession: WorkoutSession | null;
   activeExerciseIndex: number;
   history: WorkoutSession[];
   personalRecords: PersonalRecord[];
   bodyMetrics: BodyMetric[];
   restTimer: RestTimerState;
+  isLoadingFirebase: boolean;
+
+  initializeFirebaseData: (userId?: string) => Promise<void>;
+  saveNewRoutine: (name: string, exercises: ExerciseTarget[], userId?: string) => Promise<void>;
+  createCustomExercise: (ex: ExerciseDefinition) => Promise<void>;
 
   startWorkout: (day: WorkoutDay) => void;
   updateSet: (exerciseId: string, setNumber: number, weight: number, reps: number, rir?: number) => void;
@@ -44,11 +59,13 @@ interface WorkoutStoreState {
 
 export const useWorkoutStore = create<WorkoutStoreState>((set, get) => ({
   program: INITIAL_PPL_PROGRAM,
+  exerciseDatabase: EXERCISE_DATABASE,
   activeSession: null,
   activeExerciseIndex: 0,
   history: [],
   personalRecords: [],
   bodyMetrics: [],
+  isLoadingFirebase: false,
   restTimer: {
     secondsRemaining: 0,
     totalSeconds: 0,
@@ -58,8 +75,65 @@ export const useWorkoutStore = create<WorkoutStoreState>((set, get) => ({
 
   setActiveExerciseIndex: (index: number) => set({ activeExerciseIndex: index }),
 
+  // --------------------------------------------------------
+  // FIREBASE REALTIME INITIALIZATION & SYNC
+  // --------------------------------------------------------
+  initializeFirebaseData: async (userId?: string) => {
+    set({ isLoadingFirebase: true });
+    try {
+      // 1. Load Exercises dynamically from Firebase
+      const exercises = await getOrSeedExercises();
+      // 2. Load Programs / Routines dynamically from Firebase
+      const program = await getOrSeedProgram(userId);
+      // 3. Load User History & PRs from Firebase if user logged in
+      let history: WorkoutSession[] = [];
+      let personalRecords: PersonalRecord[] = [];
+      if (userId && userId !== 'guest-user-123') {
+        history = await fetchUserSessionsFromFirebase(userId);
+        personalRecords = await fetchUserPRsFromFirebase(userId);
+      }
+
+      set({
+        exerciseDatabase: exercises,
+        program: program || INITIAL_PPL_PROGRAM,
+        history,
+        personalRecords,
+        isLoadingFirebase: false
+      });
+    } catch (err) {
+      console.warn('Error syncing data with Firebase Firestore:', err);
+      set({ isLoadingFirebase: false });
+    }
+  },
+
+  saveNewRoutine: async (name: string, exercises: ExerciseTarget[], userId?: string) => {
+    const { program } = get();
+    const newDay: WorkoutDay = {
+      id: `routine-day-${Date.now()}`,
+      name,
+      focus: 'Custom Routine',
+      dayOrder: program.days.length + 1,
+      exercises
+    };
+
+    const updatedProgram: WorkoutProgram = {
+      ...program,
+      days: [...program.days, newDay]
+    };
+
+    set({ program: updatedProgram });
+    await saveProgramToFirebase(updatedProgram, userId);
+  },
+
+  createCustomExercise: async (ex: ExerciseDefinition) => {
+    const { exerciseDatabase } = get();
+    const updated = [ex, ...exerciseDatabase];
+    set({ exerciseDatabase: updated });
+    await saveCustomExerciseToFirebase(ex);
+  },
+
   startWorkout: (day: WorkoutDay) => {
-    const history = get().history;
+    const { history, program } = get();
     const previousSession = history
       .filter((s) => s.workoutDayId === day.id && s.status === 'completed')
       .sort((a, b) => new Date(b.completedAt || b.startedAt).getTime() - new Date(a.completedAt || a.startedAt).getTime())[0];
@@ -95,7 +169,7 @@ export const useWorkoutStore = create<WorkoutStoreState>((set, get) => ({
 
     const newSession: WorkoutSession = {
       id: `session-${Date.now()}`,
-      programId: INITIAL_PPL_PROGRAM.id,
+      programId: program.id,
       workoutDayId: day.id,
       dayName: day.name,
       dayFocus: day.focus,
@@ -128,7 +202,7 @@ export const useWorkoutStore = create<WorkoutStoreState>((set, get) => ({
   },
 
   toggleSetCompletion: (exerciseId: string, setNumber: number) => {
-    const { activeSession, personalRecords, startRestTimer } = get();
+    const { activeSession, personalRecords, startRestTimer, program } = get();
     if (!activeSession) return;
 
     let targetRestSeconds = 90;
@@ -139,7 +213,7 @@ export const useWorkoutStore = create<WorkoutStoreState>((set, get) => ({
       if (ex.exerciseId !== exerciseId) return ex;
       targetExName = ex.exerciseName;
 
-      const programDay = INITIAL_PPL_PROGRAM.days.find((d) => d.id === activeSession.workoutDayId);
+      const programDay = program.days.find((d) => d.id === activeSession.workoutDayId);
       const programEx = programDay?.exercises.find((e) => e.exerciseId === exerciseId);
       if (programEx) targetRestSeconds = programEx.restSeconds;
 
@@ -269,7 +343,7 @@ export const useWorkoutStore = create<WorkoutStoreState>((set, get) => ({
   },
 
   finishWorkout: async (userId?: string) => {
-    const { activeSession, history } = get();
+    const { activeSession, history, personalRecords } = get();
     if (!activeSession) return;
 
     const completedAt = new Date().toISOString();
@@ -304,11 +378,11 @@ export const useWorkoutStore = create<WorkoutStoreState>((set, get) => ({
     });
 
     if (userId && userId !== 'guest-user-123') {
-      try {
-        const sessionRef = doc(db, `users/${userId}/sessions/${finishedSession.id}`);
-        await setDoc(sessionRef, finishedSession);
-      } catch (err) {
-        console.error('Failed to sync completed session to Firestore:', err);
+      await saveSessionToFirebase(userId, finishedSession);
+      for (const pr of personalRecords) {
+        if (pr.sessionId === finishedSession.id) {
+          await savePRToFirebase(userId, pr);
+        }
       }
     }
   },
@@ -365,20 +439,13 @@ export const useWorkoutStore = create<WorkoutStoreState>((set, get) => ({
 
   loadUserWorkoutData: async (userId: string) => {
     if (!userId || userId === 'guest-user-123') return;
-
     try {
-      const sessionsRef = collection(db, `users/${userId}/sessions`);
-      const q = query(sessionsRef, orderBy('startedAt', 'desc'));
-      const snapshot = await getDocs(q);
-
-      const loadedSessions: WorkoutSession[] = [];
-      snapshot.forEach((docSnap: QueryDocumentSnapshot) => {
-        loadedSessions.push(docSnap.data() as WorkoutSession);
-      });
-
-      set({ history: loadedSessions });
+      const history = await fetchUserSessionsFromFirebase(userId);
+      const personalRecords = await fetchUserPRsFromFirebase(userId);
+      set({ history, personalRecords });
     } catch (err) {
-      console.warn('Unable to fetch Firestore history, using local state:', err);
+      console.warn('Unable to fetch Firestore user data:', err);
     }
   }
 }));
+

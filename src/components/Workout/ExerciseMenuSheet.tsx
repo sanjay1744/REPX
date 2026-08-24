@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
-import type { ExerciseLog } from '../../types';
-import { EXERCISE_DATABASE, ExerciseDefinition } from '../../data/exerciseDatabase';
+import type { ExerciseLog, ExerciseDefinition } from '../../types';
+import { useWorkoutStore } from '../../store/useWorkoutStore';
+
 import {
   ArrowUpDown,
   RefreshCw,
@@ -13,6 +14,7 @@ import {
   ChevronRight,
   Info
 } from 'lucide-react';
+
 
 interface ExerciseMenuSheetProps {
   isOpen: boolean;
@@ -33,6 +35,7 @@ export const ExerciseMenuSheet: React.FC<ExerciseMenuSheetProps> = ({
   onReplaceExercise,
   onReorderExercises
 }) => {
+  const { exerciseDatabase } = useWorkoutStore();
   const [activeModal, setActiveModal] = useState<'menu' | 'reorder' | 'replace'>('menu');
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMuscleFilter, setSelectedMuscleFilter] = useState<string>('All');
@@ -100,7 +103,7 @@ export const ExerciseMenuSheet: React.FC<ExerciseMenuSheetProps> = ({
   };
 
   // Filter exercises for replace modal
-  const filteredDatabase = EXERCISE_DATABASE.filter((ex) => {
+  const filteredDatabase = exerciseDatabase.filter((ex) => {
     const matchesSearch = ex.name.toLowerCase().includes(searchQuery.toLowerCase()) || ex.muscleGroup.toLowerCase().includes(searchQuery.toLowerCase());
     const matchesMuscle = selectedMuscleFilter === 'All' || ex.muscleGroup.toLowerCase() === selectedMuscleFilter.toLowerCase();
     const matchesEquipment = selectedEquipmentFilter === 'All' || ex.equipment.toLowerCase() === selectedEquipmentFilter.toLowerCase();

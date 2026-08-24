@@ -1,6 +1,16 @@
 export type WeightUnit = 'kg' | 'lbs';
 
+export interface ExerciseDefinition {
+  id: string;
+  name: string;
+  muscleGroup: 'Abdominals' | 'Biceps' | 'Chest' | 'Forearms' | 'Lats' | 'Lower Back' | 'Neck' | 'Shoulders' | 'Traps' | 'Triceps' | 'Upper Back' | 'Calves' | 'Glutes' | 'Hamstrings' | 'Quads' | string;
+  category: 'Upper Body' | 'Lower Body' | 'Core' | string;
+  equipment: 'None' | 'Barbell' | 'Dumbbell' | 'Kettlebell' | 'Machine' | 'Plate' | 'Resistance Band' | 'Suspension Band' | 'Cable' | 'Other' | string;
+  instructions?: string;
+}
+
 export interface UserProfile {
+
   uid: string;
   name: string;
   email: string;

@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Plus, ClipboardList, Search, ArrowRight, Dumbbell, ChevronDown, Play } from 'lucide-react';
 import { useWorkoutStore } from '../store/useWorkoutStore';
-import { INITIAL_PPL_PROGRAM } from '../data/pplProgramData';
+import { useAuthStore } from '../store/useAuthStore';
 import { CreateRoutineModal } from '../components/Workout/CreateRoutineModal';
 import { WorkoutDay, ExerciseTarget } from '../types';
 
@@ -11,8 +11,8 @@ interface WorkoutTabProps {
 }
 
 export const WorkoutTab: React.FC<WorkoutTabProps> = ({ onStartWorkout }) => {
-  const { program, history, activeSession, startWorkout } = useWorkoutStore();
-  const [customRoutines, setCustomRoutines] = useState<WorkoutDay[]>([]);
+  const { user } = useAuthStore();
+  const { program, history, activeSession, startWorkout, saveNewRoutine } = useWorkoutStore();
   const [isCreateRoutineOpen, setIsCreateRoutineOpen] = useState(false);
   const [isAllDaysOpen, setIsAllDaysOpen] = useState(false);
   const [selectedDayId, setSelectedDayId] = useState<string | null>(null);
@@ -36,16 +36,10 @@ export const WorkoutTab: React.FC<WorkoutTabProps> = ({ onStartWorkout }) => {
     startWorkout(emptyDay);
   };
 
-  const handleSaveCustomRoutine = (name: string, exercises: ExerciseTarget[]) => {
-    const newRoutine: WorkoutDay = {
-      id: `custom-routine-${Date.now()}`,
-      name,
-      focus: 'Custom Routine',
-      dayOrder: customRoutines.length + 1,
-      exercises
-    };
-    setCustomRoutines([...customRoutines, newRoutine]);
+  const handleSaveCustomRoutine = async (name: string, exercises: ExerciseTarget[]) => {
+    await saveNewRoutine(name, exercises, user?.uid);
   };
+
 
   return (
     <div className="space-y-5 pb-28">
@@ -103,41 +97,12 @@ export const WorkoutTab: React.FC<WorkoutTabProps> = ({ onStartWorkout }) => {
       {/* Routine Cards List */}
       <div className="space-y-3.5">
         <div className="flex items-center justify-between">
-          <h4 className="text-xs font-extrabold text-zinc-400 uppercase tracking-wider">My Routines</h4>
+          <h4 className="text-xs font-extrabold text-zinc-400 uppercase tracking-wider">My Routines & Program Days</h4>
           <span className="text-xs text-zinc-500 font-medium">
-            {customRoutines.length + 1} Split Available
+            {program.days.length} Days / Routines
           </span>
         </div>
 
-        {/* Custom Routines List if any */}
-        {customRoutines.map((routine) => (
-          <div
-            key={routine.id}
-            className="glass-panel rounded-2xl p-4 sm:p-5 space-y-3 border border-white/10 hover:border-white/20 transition-all"
-          >
-            <div className="flex items-center justify-between">
-              <div>
-                <h4 className="text-base font-black text-white">{routine.name}</h4>
-                <p className="text-xs text-zinc-400 font-semibold">{routine.exercises.length} Exercises</p>
-              </div>
-              <button
-                onClick={() => startWorkout(routine)}
-                className="bg-white hover:bg-zinc-200 text-black px-4 py-2 rounded-xl text-xs font-black transition-all flex items-center gap-1.5 shadow-md"
-              >
-                <Play className="w-3.5 h-3.5 fill-black" />
-                <span>Start</span>
-              </button>
-            </div>
-
-            <div className="flex flex-wrap gap-1.5 pt-1">
-              {routine.exercises.map((ex) => (
-                <span key={ex.id} className="glass-input text-zinc-300 text-[11px] px-2.5 py-1 rounded-xl font-medium">
-                  {ex.name}
-                </span>
-              ))}
-            </div>
-          </div>
-        ))}
 
         {/* SINGLE CONTAINER: PPL Split */}
         <div className="glass-panel rounded-2xl sm:rounded-3xl p-3.5 sm:p-4 border border-white/15 shadow-2xl space-y-3">

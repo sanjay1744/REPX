@@ -9,12 +9,12 @@ import { WorkoutTab } from './pages/WorkoutTab';
 import { HistoryPage } from './pages/History';
 import { AnalyticsPage } from './pages/Analytics';
 import { PersonalRecordsPage } from './pages/PersonalRecords';
-import { INITIAL_PPL_PROGRAM } from './data/pplProgramData';
+
 
 export function App() {
   const [activeTab, setActiveTab] = useState<'dashboard' | 'workout' | 'history' | 'analytics' | 'prs'>('dashboard');
   const { initializeAuth, user } = useAuthStore();
-  const { activeSession, startWorkout, loadUserWorkoutData } = useWorkoutStore();
+  const { activeSession, startWorkout, program, initializeFirebaseData } = useWorkoutStore();
 
   useEffect(() => {
     const unsubscribe = initializeAuth();
@@ -22,18 +22,17 @@ export function App() {
   }, [initializeAuth]);
 
   useEffect(() => {
-    if (user?.uid) {
-      loadUserWorkoutData(user.uid);
-    }
-  }, [user?.uid, loadUserWorkoutData]);
+    initializeFirebaseData(user?.uid);
+  }, [user?.uid, initializeFirebaseData]);
 
   const handleStartWorkout = (dayId: string) => {
-    const day = INITIAL_PPL_PROGRAM.days.find((d) => d.id === dayId);
+    const day = program.days.find((d) => d.id === dayId);
     if (day) {
       startWorkout(day);
       setActiveTab('workout');
     }
   };
+
 
   return (
     <div className="min-h-screen bg-[#08080C] text-zinc-100 font-sans relative">

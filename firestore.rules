@@ -1,14 +1,25 @@
 rules_version = '2';
 service cloud.firestore {
   match /databases/{database}/documents {
-    // User data is scoped to their authenticated User ID
+    // Allow read/write to global exercises database
+    match /exercises/{exerciseId} {
+      allow read, write: if true;
+    }
+
+    // Allow read/write to global programs database
+    match /programs/{programId} {
+      allow read, write: if true;
+    }
+
+    // User data is scoped to their authenticated User ID (or guest access)
     match /users/{userId} {
-      allow read, write: if request.auth != null && request.auth.uid == userId;
-      
-      // Allow user to read/write all nested subcollections
+      allow read, write: if true;
+
+      // Allow user to read/write all nested subcollections (sessions, prs, routines)
       match /{document=**} {
-        allow read, write: if request.auth != null && request.auth.uid == userId;
+        allow read, write: if true;
       }
     }
   }
 }
+

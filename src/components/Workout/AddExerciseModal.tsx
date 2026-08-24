@@ -1,6 +1,7 @@
 import React, { useState, useMemo } from 'react';
 import { Search, Info, Plus, ChevronDown } from 'lucide-react';
-import { EXERCISE_DATABASE, ExerciseDefinition } from '../../data/exerciseDatabase';
+import type { ExerciseDefinition } from '../../types';
+import { useWorkoutStore } from '../../store/useWorkoutStore';
 import { MuscleGroupSheet } from './MuscleGroupSheet';
 import { EquipmentSheet } from './EquipmentSheet';
 
@@ -15,6 +16,7 @@ export const AddExerciseModal: React.FC<AddExerciseModalProps> = ({
   onClose,
   onSelectExercise
 }) => {
+  const { exerciseDatabase, createCustomExercise } = useWorkoutStore();
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedMuscles, setSelectedMuscles] = useState<string[]>([]);
   const [selectedEquipment, setSelectedEquipment] = useState<string[]>([]);
@@ -22,16 +24,17 @@ export const AddExerciseModal: React.FC<AddExerciseModalProps> = ({
   const [isEquipmentSheetOpen, setIsEquipmentSheetOpen] = useState(false);
 
   const filteredExercises = useMemo(() => {
-    return EXERCISE_DATABASE.filter((ex) => {
+    return exerciseDatabase.filter((ex) => {
       const matchesSearch = ex.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
                             ex.muscleGroup.toLowerCase().includes(searchQuery.toLowerCase());
       const matchesMuscle = selectedMuscles.length === 0 || selectedMuscles.includes(ex.muscleGroup);
       const matchesEquipment = selectedEquipment.length === 0 || selectedEquipment.includes(ex.equipment);
       return matchesSearch && matchesMuscle && matchesEquipment;
     });
-  }, [searchQuery, selectedMuscles, selectedEquipment]);
+  }, [exerciseDatabase, searchQuery, selectedMuscles, selectedEquipment]);
 
   if (!isOpen) return null;
+
 
   const handleToggleMuscle = (muscle: string) => {
     if (selectedMuscles.includes(muscle)) {
@@ -58,16 +61,18 @@ export const AddExerciseModal: React.FC<AddExerciseModalProps> = ({
         </button>
         <h2 className="text-base font-black text-white">Add Exercise</h2>
         <button
-          onClick={() => {
+          onClick={async () => {
             const customName = prompt('Enter custom exercise name:');
             if (customName) {
-              onSelectExercise({
+              const newEx: ExerciseDefinition = {
                 id: `custom-${Date.now()}`,
                 name: customName,
                 muscleGroup: 'Chest',
                 category: 'Upper Body',
                 equipment: 'Barbell'
-              });
+              };
+              await createCustomExercise(newEx);
+              onSelectExercise(newEx);
               onClose();
             }
           }}

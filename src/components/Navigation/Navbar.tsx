@@ -1,6 +1,7 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { useAuthStore } from '../../store/useAuthStore';
 import { Dumbbell, LayoutDashboard, History, BarChart3, Trophy, LogIn, LogOut } from 'lucide-react';
+import { AuthModal } from '../Auth/AuthModal';
 
 interface NavbarProps {
   activeTab: 'dashboard' | 'workout' | 'history' | 'analytics' | 'prs';
@@ -9,7 +10,8 @@ interface NavbarProps {
 }
 
 export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, isSessionActive }) => {
-  const { user, isGuest, signInWithGoogle, signOut } = useAuthStore();
+  const { user, isGuest, signOut } = useAuthStore();
+  const [isAuthModalOpen, setIsAuthModalOpen] = useState(false);
   const isWorkoutSessionActive = isSessionActive && activeTab === 'workout';
 
   return (
@@ -46,11 +48,11 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, isSessi
 
             {isGuest ? (
               <button
-                onClick={signInWithGoogle}
+                onClick={() => setIsAuthModalOpen(true)}
                 className="flex items-center gap-1 glass-input text-white px-2.5 py-1.5 rounded-xl text-[11px] sm:text-xs font-bold hover:bg-white hover:text-black transition-all"
               >
                 <LogIn className="w-3 h-3" />
-                <span>Sync</span>
+                <span>Sign In</span>
               </button>
             ) : (
               <div className="flex items-center gap-1.5 glass-input px-2.5 py-1.5 rounded-xl text-xs">
@@ -67,6 +69,10 @@ export const Navbar: React.FC<NavbarProps> = ({ activeTab, setActiveTab, isSessi
           </div>
         </div>
       </header>
+
+      {/* Auth Modal */}
+      <AuthModal isOpen={isAuthModalOpen} onClose={() => setIsAuthModalOpen(false)} />
+
 
       {/* Mobile Compact Floating Bottom Dock Navigation Bar */}
       <nav className="fixed bottom-2.5 left-3 right-3 z-40 max-w-md mx-auto sm:max-w-lg">

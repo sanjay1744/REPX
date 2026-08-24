@@ -145,5 +145,23 @@
   border: 1px solid rgba(255, 255, 255, 0.1);
 }
 
+/* Hide number input spinners for clean sleek inputs */
+input[type='number']::-webkit-inner-spin-button,
+input[type='number']::-webkit-outer-spin-button {
+  -webkit-appearance: none;
+  margin: 0;
+}
+input[type='number'] {
+  -moz-appearance: textfield;
+}
 
+/* Smooth Sheet Pop-Up & Pop-Down Transitions */
+.sheet-backdrop {
+  transition: opacity 350ms cubic-bezier(0.32, 0.72, 0, 1), backdrop-filter 350ms ease;
+}
+
+.sheet-panel {
+  transition: transform 380ms cubic-bezier(0.32, 0.72, 0, 1), opacity 320ms cubic-bezier(0.32, 0.72, 0, 1);
+  will-change: transform, opacity;
+}
 

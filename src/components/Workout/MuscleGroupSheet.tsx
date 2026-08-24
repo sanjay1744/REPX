@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { X, Check } from 'lucide-react';
 
 interface MuscleGroupSheetProps {
@@ -36,23 +36,53 @@ export const MuscleGroupSheet: React.FC<MuscleGroupSheetProps> = ({
   onClearFilters,
   onClose
 }) => {
-  if (!isOpen) return null;
+  const [isRendered, setIsRendered] = useState(false);
+  const [isVisible, setIsVisible] = useState(false);
+
+  useEffect(() => {
+    if (isOpen) {
+      setIsRendered(true);
+      const timer = setTimeout(() => setIsVisible(true), 20);
+      return () => clearTimeout(timer);
+    } else {
+      setIsVisible(false);
+      const timer = setTimeout(() => setIsRendered(false), 350);
+      return () => clearTimeout(timer);
+    }
+  }, [isOpen]);
+
+  const handleSmoothClose = (callback?: () => void) => {
+    setIsVisible(false);
+    setTimeout(() => {
+      if (callback) callback();
+      onClose();
+    }, 320);
+  };
+
+  if (!isRendered) return null;
 
   const upperBody = MUSCLE_GROUPS.filter((m) => m.category === 'Upper Body');
   const lowerBody = MUSCLE_GROUPS.filter((m) => m.category === 'Lower Body');
 
   return (
-    <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col justify-end animate-fade-in">
+    <div
+      onClick={() => handleSmoothClose()}
+      className={`fixed inset-0 z-50 bg-black/80 backdrop-blur-md flex flex-col justify-end sheet-backdrop ${
+        isVisible ? 'opacity-100 pointer-events-auto' : 'opacity-0 pointer-events-none'
+      }`}
+    >
       <div
-        className="w-full max-w-md mx-auto sm:max-w-xl bg-[#121216] border-t border-white/15 rounded-t-3xl p-4 sm:p-5 max-h-[85vh] flex flex-col shadow-2xl relative"
+        className={`w-full max-w-md mx-auto sm:max-w-xl bg-[#121216] border-t border-white/15 rounded-t-3xl p-4 sm:p-5 max-h-[85vh] flex flex-col shadow-2xl relative sheet-panel ${
+          isVisible ? 'opacity-100 translate-y-0 scale-100' : 'opacity-0 translate-y-full scale-95'
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Top Handle Bar */}
-        <div className="w-12 h-1 bg-zinc-600 rounded-full mx-auto mb-3 cursor-pointer" onClick={onClose} />
+        <div className="w-12 h-1 bg-zinc-600 rounded-full mx-auto mb-3 cursor-pointer hover:bg-zinc-400 transition-colors" onClick={() => handleSmoothClose()} />
 
         <div className="flex items-center justify-between pb-3 border-b border-white/10">
           <h3 className="text-base font-black text-white">Muscle Group</h3>
-          <button onClick={onClose} className="text-zinc-400 hover:text-white p-1 rounded-full">
+          <button onClick={() => handleSmoothClose()} className="text-zinc-400 hover:text-white p-1 rounded-full">
             <X className="w-5 h-5" />
           </button>
         </div>
@@ -121,7 +151,7 @@ export const MuscleGroupSheet: React.FC<MuscleGroupSheetProps> = ({
             Clear Filters
           </button>
           <button
-            onClick={onClose}
+            onClick={() => handleSmoothClose()}
             className="flex-1 bg-blue-600 hover:bg-blue-500 text-white py-3 rounded-2xl text-xs font-black shadow-lg transition-all"
           >
             Show {totalResultsCount} results

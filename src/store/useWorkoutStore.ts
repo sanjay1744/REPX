@@ -27,6 +27,9 @@ interface WorkoutStoreState {
   addSetToExercise: (exerciseId: string) => void;
   deleteSetFromExercise: (exerciseId: string, setNumber: number) => void;
   addExerciseToActiveSession: (exercise: { exerciseId: string; name: string; muscleGroup: string; equipment: string }) => void;
+  removeExerciseFromActiveSession: (exerciseId: string) => void;
+  replaceExerciseInActiveSession: (oldExerciseId: string, newExercise: { exerciseId: string; name: string; muscleGroup: string; equipment: string }) => void;
+  reorderExercisesInActiveSession: (newExercises: ExerciseLog[]) => void;
   finishWorkout: (userId?: string) => Promise<void>;
   discardWorkout: () => void;
 
@@ -221,6 +224,34 @@ export const useWorkoutStore = create<WorkoutStoreState>((set, get) => ({
       activeSession: { ...activeSession, exercises: updatedExercises },
       activeExerciseIndex: updatedExercises.length - 1
     });
+  },
+
+  removeExerciseFromActiveSession: (exerciseId: string) => {
+    const { activeSession } = get();
+    if (!activeSession) return;
+    const updatedExercises = activeSession.exercises.filter((ex) => ex.exerciseId !== exerciseId);
+    set({ activeSession: { ...activeSession, exercises: updatedExercises } });
+  },
+
+  replaceExerciseInActiveSession: (oldExerciseId: string, newExercise: { exerciseId: string; name: string; muscleGroup: string; equipment: string }) => {
+    const { activeSession } = get();
+    if (!activeSession) return;
+    const updatedExercises = activeSession.exercises.map((ex) => {
+      if (ex.exerciseId !== oldExerciseId) return ex;
+      return {
+        ...ex,
+        exerciseId: newExercise.exerciseId,
+        exerciseName: newExercise.name,
+        muscleGroup: newExercise.muscleGroup,
+      };
+    });
+    set({ activeSession: { ...activeSession, exercises: updatedExercises } });
+  },
+
+  reorderExercisesInActiveSession: (newExercises: ExerciseLog[]) => {
+    const { activeSession } = get();
+    if (!activeSession) return;
+    set({ activeSession: { ...activeSession, exercises: newExercises } });
   },
 
   deleteSetFromExercise: (exerciseId: string, setNumber: number) => {

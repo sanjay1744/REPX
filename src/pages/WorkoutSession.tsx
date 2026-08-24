@@ -3,6 +3,7 @@ import { useWorkoutStore } from '../store/useWorkoutStore';
 import { useAuthStore } from '../store/useAuthStore';
 import { SetRow } from '../components/Workout/SetRow';
 import { AddExerciseModal } from '../components/Workout/AddExerciseModal';
+import { ExerciseMenuSheet } from '../components/Workout/ExerciseMenuSheet';
 import type { WorkoutSession, ExerciseLog, SetLog } from '../types';
 import {
   ChevronDown,
@@ -27,6 +28,9 @@ export const WorkoutSessionPage: React.FC<WorkoutSessionProps> = ({ onNavigateTa
     addSetToExercise,
     deleteSetFromExercise,
     addExerciseToActiveSession,
+    removeExerciseFromActiveSession,
+    replaceExerciseInActiveSession,
+    reorderExercisesInActiveSession,
     finishWorkout,
     discardWorkout,
     history
@@ -36,6 +40,7 @@ export const WorkoutSessionPage: React.FC<WorkoutSessionProps> = ({ onNavigateTa
   const [showFinishModal, setShowFinishModal] = useState(false);
   const [isAddModalOpen, setIsAddModalOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [selectedMenuExercise, setSelectedMenuExercise] = useState<ExerciseLog | null>(null);
 
   useEffect(() => {
     if (!activeSession) return;
@@ -177,7 +182,11 @@ export const WorkoutSessionPage: React.FC<WorkoutSessionProps> = ({ onNavigateTa
                     </div>
                   </div>
 
-                  <button className="p-1.5 text-zinc-400 hover:text-white rounded-lg transition-colors">
+                  <button
+                    onClick={() => setSelectedMenuExercise(ex)}
+                    className="p-1.5 text-zinc-400 hover:text-white rounded-lg transition-colors"
+                    title="Exercise Options"
+                  >
                     <MoreVertical className="w-4 h-4 text-zinc-400" />
                   </button>
                 </div>
@@ -280,6 +289,24 @@ export const WorkoutSessionPage: React.FC<WorkoutSessionProps> = ({ onNavigateTa
             equipment: exDef.equipment
           });
         }}
+      />
+
+      {/* 3-Dots Exercise Menu Bottom Sheet & Modals */}
+      <ExerciseMenuSheet
+        isOpen={!!selectedMenuExercise}
+        exercise={selectedMenuExercise}
+        allExercises={activeSession.exercises}
+        onClose={() => setSelectedMenuExercise(null)}
+        onRemoveExercise={(exId) => removeExerciseFromActiveSession(exId)}
+        onReplaceExercise={(oldExId, newExDef) =>
+          replaceExerciseInActiveSession(oldExId, {
+            exerciseId: newExDef.id,
+            name: newExDef.name,
+            muscleGroup: newExDef.muscleGroup,
+            equipment: newExDef.equipment
+          })
+        }
+        onReorderExercises={(reordered) => reorderExercisesInActiveSession(reordered)}
       />
 
       {/* Finish Session Confirmation Modal */}
